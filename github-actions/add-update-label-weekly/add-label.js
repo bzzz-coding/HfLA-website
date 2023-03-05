@@ -18,9 +18,9 @@ const commentByDays = 7; // number of days ago to check for comment by assignee
 // const threeDayCutoffTime = new Date()
 // threeDayCutoffTime.setDate(threeDayCutoffTime.getDate() - updatedByDays)
 const sevenDayCutoffTime = new Date()
-sevenDayCutoffTime.setMinutes(sevenDayCutoffTime.getMinutes() - commentByDays)) // changed to 7min ago for testing
+sevenDayCutoffTime.setMinutes(sevenDayCutoffTime.getMinutes() - commentByDays) // changed to 7min ago for testing
 const fourteenDayCutoffTime = new Date()
-fourteenDayCutoffTime.setMinutes(fourteenDayCutoffTime.getMinutes() - inactiveUpdatedByDays)) // changed to 14min ago for testing
+fourteenDayCutoffTime.setMinutes(fourteenDayCutoffTime.getMinutes() - inactiveUpdatedByDays) // changed to 14min ago for testing
 
 /**
  * The main function, which retrieves issues from a specific column in a specific project, before examining the timeline of each issue for outdatedness. If outdated, the old status label is removed, and an updated is requested. Otherwise, the issue is labeled as updated.
