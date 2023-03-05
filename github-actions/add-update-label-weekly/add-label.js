@@ -168,7 +168,7 @@ function isTimelineOutdated(timeline, issueNum, assignees) {
         break
 			} 
 			else if (moment.event === 'assigned') {
-				console.log(`Is there a property 'assignee'? ${moment.assignee}`)
+				console.log(`Is there a property 'assignee'? login: ${moment.assignee.login}`)
 			}
       else if (moment.event === 'assigned' && assignees.includes(moment.assignee.login)) { // if not the two former cases, check if this event is assigning an assignee to this issue, if so, set responseObj.labels to '', and make sure responseObj.result is false--no need for an 'To Update !' label or an '2 weeks inactive' label
         responseObj.result = false;
