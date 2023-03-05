@@ -18,9 +18,9 @@ const commentByDays = 7; // number of days ago to check for comment by assignee
 // const threeDayCutoffTime = new Date()
 // threeDayCutoffTime.setDate(threeDayCutoffTime.getDate() - updatedByDays)
 const sevenDayCutoffTime = new Date()
-sevenDayCutoffTime.setMinutes(sevenDayCutoffTime.getMinutes() - commentByDays) // changed to 7min ago for testing
+sevenDayCutoffTime.setHours(sevenDayCutoffTime.getHours() - commentByDays) // changed to 7min ago for testing
 const fourteenDayCutoffTime = new Date()
-fourteenDayCutoffTime.setMinutes(fourteenDayCutoffTime.getMinutes() - inactiveUpdatedByDays) // changed to 14min ago for testing
+fourteenDayCutoffTime.setHours(fourteenDayCutoffTime.getHours() - inactiveUpdatedByDays) // changed to 14min ago for testing
 
 /**
  * The main function, which retrieves issues from a specific column in a specific project, before examining the timeline of each issue for outdatedness. If outdated, the old status label is removed, and an updated is requested. Otherwise, the issue is labeled as updated.
@@ -148,48 +148,42 @@ async function getTimeline(issueNum) {
 function isTimelineOutdated(timeline, issueNum, assignees) {
   // Setting initial responseObj and properties to update/refer to these values in the for...loop 
   let responseObj = {
-      result: true,
-      labels: inactiveLabel,
-      }
+    result: true,
+    labels: inactiveLabel,
+  };
+ 
   /* I don't think this needs to be an await for...loop because there is no async function calls within the loop - Bitian Zhang 3/4/23 */
-	for (let moment of timeline) {
+  for (let moment of timeline) {
+    // if issue was crossed-referenced in a PR by an assignee ANYTIME in the events timeline, the issue is considered updated, immediately return {result: false, labels: statusUpdatedLabel}
+    if (moment.event === 'cross-referenced' && isLinkedIssue(moment, issueNum) && assignees.includes(moment.actor.login)) {
+      console.log('Cross-referenced by assignee in a PR');
+      responseObj.result = false;
+      responseObj.labels = statusUpdatedLabel;
+      return responseObj
+    }
+
     let eventTimestamp = moment.updated_at ? moment.updated_at : moment.created_at;
-		if (isMomentRecent(eventTimestamp, sevenDayCutoffTime)) { // if event occurred within 7 days
-			if (moment.event === 'cross-referenced' && isLinkedIssue(moment, issueNum) && assignees.includes(moment.actor.login)) { // if cross-referenced in a PR by assignee within 7 days, update the responseObj and break the loop
-				console.log('Cross-referenced by assignee within 7 days');
-				responseObj.result = false;
-        responseObj.labels = statusUpdatedLabel;
-        break
-			} 
-      else if (moment.event === 'commented' && isCommentByAssignees(moment, assignees)) { // if commented by assignee within 7 days, update the responseObj and break the loop
-				console.log('Commented by assignee within 7 days');
-				responseObj.result = false;
-        responseObj.labels = statusUpdatedLabel;
-        break
-			} 
-			else if (moment.event === 'assigned') {
-				console.log(`Is there a property 'assignee'? login: ${moment.assignee.login}`)
-			}
-      else if (moment.event === 'assigned' && assignees.includes(moment.assignee.login)) { // if not the two former cases, check if this event is assigning an assignee to this issue, if so, set responseObj.labels to '', and make sure responseObj.result is false--no need for an 'To Update !' label or an '2 weeks inactive' label
+
+    if (isMomentRecent(eventTimestamp, sevenDayCutoffTime)) { // if event occurred within 7 days
+      if (moment.event === 'commented' && isCommentByAssignees(moment, assignees)) { // if commented by assignee within 7 days, update the responseObj and return
+        console.log('Commented by assignee within 7 days');
         responseObj.result = false;
-        responseObj.labels = ''
+        responseObj.labels = statusUpdatedLabel;
+        return responseObj
       }
-		}
-		else if (isMomentRecent(moment.created_at, fourteenDayCutoffTime)) { // if event occurred between 7 and 14 days
-			if (moment.event === 'cross-referenced' && isLinkedIssue(moment, issueNum) && assignees.includes(moment.actor.login)) { // if cross-referenced in a PR by assignee within 14 days, update responseObj
-				console.log('Cross-referenced by assignee between 7 and 14 days');
-				responseObj.result = true;
-        responseObj.labels = toUpdateLabel;
-			}
-      else if (moment.event === 'commented' && isCommentByAssignees(moment, assignees)) { // if commented by assignee within 14 days,  update responseObj
-				console.log('Commented by assignee between 7 and 14 days');
-				responseObj.result = true;
-        responseObj.labels = toUpdateLabel;
-			} 
-		}
-	}
+      else if (moment.event === 'assigned' && assignees.includes(moment.assignee.login)) { // if this event is assigning an assignee to this issue, set responseObj.labels to ''--issue is not outdated, and does not need an label for this case
+        responseObj.result = false;
+        responseObj.labels = '';
+      }
+    }
+    else if (isMomentRecent(eventTimestamp, fourteenDayCutoffTime) && moment.event === 'commented' && isCommentByAssignees(moment, assignees)) { // if event occurred between 7 and 14 days and is a comment by an assignee,  update responseObj
+      console.log('Commented by assignee between 7 and 14 days');
+      responseObj.result = true;
+      responseObj.labels = toUpdateLabel;
+    }
+  }
   return responseObj
-}	
+}
 
 /**
  * Removes labels from a specified issue
