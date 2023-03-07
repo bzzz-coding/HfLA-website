@@ -145,8 +145,8 @@ function isTimelineOutdated(timeline, issueNum, assignees) {
   let lastCommentTimestamp = null;
 
   for (const i = timeline.length - 1; i >= 0; i--) {
-    const eventObj = timeline[i];
-    const eventType = eventObj.event;
+    let eventObj = timeline[i];
+    let eventType = eventObj.event;
 
     // if cross-referenced and fixed/resolved/closed by assignee, issue is considered updated
     // isLinkedIssue checks if the 'body'(comment) of the event mentioned closing/fixing/resolving this current issue
