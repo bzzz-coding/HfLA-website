@@ -154,7 +154,7 @@ function isTimelineOutdated(timeline, issueNum, assignees) {
       return { result: true, labels: statusUpdatedLabel }
     }
 
-    const eventTimestamp = eventObj.updated_at || eventObj.created_at;
+    let eventTimestamp = eventObj.updated_at || eventObj.created_at;
 
     // update the lastCommentTimestamp if this is the first (most recent) comment
     if (eventType === 'commented' && isCommentByAssignees(eventObj, assignees)) {
