@@ -158,14 +158,14 @@ function isTimelineOutdated(timeline, issueNum, assignees) {
 
     // update the lastCommentTimestamp if this is the first (most recent) comment
     if (eventType === 'commented' && isCommentByAssignees(eventObj, assignees)) {
-      if (!lastCommentEvent) {
+      if (!lastCommentTimestamp) {
         lastCommentTimestamp = eventTimestamp;
       }
     }
 
     // update the lastAssignedTimestamp if this is the first (most recent) time an assignee was assigned to the issue
     if (eventType === 'assigned' && assignees.includes(eventObj.assignee.login)) { // note that the assignee property has the login of the dev assigned to this issue in this event, the actor property might have a different login if the dev didn't self-assign, but was assigned by another dev
-      if (!lastAssignedEvent) {
+      if (!lastAssignedTimestamp) {
         lastAssignedTimestamp = eventTimestamp;
       }
     }
