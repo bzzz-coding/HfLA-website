@@ -189,6 +189,7 @@ async function isTimelineOutdated(timeline, issueNum, assignees) {
 	for await (let [index, moment] of timeline.entries()) {
 		if (isMomentRecent(moment.created_at, threeDayCutoffTime)) { // all the events of an issue within last three days will return true
 			if (moment.event == 'cross-referenced' && isLinkedIssue(moment, issueNum) && assignees == moment.actor.login) { // checks if cross referenced within last three days 
+				console.log(`assignees == moment.actor.login? ${assignees == moment.actor.login} assignees: ${assignees}; moment.actor.login: ${moment.actor.login}`)
 				return {result: false, labels: statusUpdatedLabel}
 			}
 			else if (moment.event == 'commented' && isCommentByAssignees(moment, assignees)) { // checks if commented within last three days 
@@ -211,6 +212,8 @@ async function isTimelineOutdated(timeline, issueNum, assignees) {
 		else if (isMomentRecent(moment.created_at, sevenDayCutoffTime)) { // all the events of an issue between three and seven days will return true
 			if (moment.event == 'cross-referenced' && isLinkedIssue(moment, issueNum) && assignees == moment.actor.login) { // checks if cross referenced between 3 and 7 days
 				console.log('between 3 and 7 cross referenced');
+				console.log(`assignees == moment.actor.login? ${assignees == moment.actor.login} assignees: ${assignees}; moment.actor.login: ${moment.actor.login}`)
+
 				return {result: false, labels: statusUpdatedLabel}
 			}
 			else if (moment.event == 'commented' && isCommentByAssignees(moment, assignees)) { // checks if commented between 3 and 7 days
@@ -231,6 +234,8 @@ async function isTimelineOutdated(timeline, issueNum, assignees) {
 		else if (isMomentRecent(moment.created_at, fourteenDayCutoffTime)) { // all the events of an issue between seven and fourteen days will return true
 			if (moment.event == 'cross-referenced' && isLinkedIssue(moment, issueNum) && assignees == moment.actor.login) { // checks if cross referenced between 7 and 14 days
 				console.log('between 7 and 14 cross referenced');
+				console.log(`assignees == moment.actor.login? ${assignees == moment.actor.login} assignees: ${assignees}; moment.actor.login: ${moment.actor.login}`)
+
 				return {result: false, labels: statusUpdatedLabel}
 			}
       else if (moment.event == 'commented' && isCommentByAssignees(moment, assignees)) { // checks if commented between 3 and 7 days
