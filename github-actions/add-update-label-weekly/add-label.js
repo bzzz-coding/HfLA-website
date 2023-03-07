@@ -12,11 +12,11 @@ const inactiveLabel = '2 weeks inactive'; // If the last time an issue was cross
 /* 
 Note: The team discussed and decided to use only the sevenDayCutoffTime to check for updated/outdated, so I'm commenting out the 3-day variables  
 */
-// const updatedByDays = 3; // number of days ago to check for to update label
+const updatedByDays = 3; // number of days ago to check for to update label
 const inactiveUpdatedByDays = 14; // number of days ago to check for inactive label
 const commentByDays = 7; // number of days ago to check for comment by assignee
-// const threeDayCutoffTime = new Date()
-// threeDayCutoffTime.setDate(threeDayCutoffTime.getDate() - updatedByDays)
+const threeDayCutoffTime = new Date()
+threeDayCutoffTime.setHours(threeDayCutoffTime.getHours() - updatedByDays)
 const sevenDayCutoffTime = new Date()
 sevenDayCutoffTime.setHours(sevenDayCutoffTime.getHours() - commentByDays) // changed to 7min ago for testing
 const fourteenDayCutoffTime = new Date()
@@ -46,25 +46,24 @@ async function main({ g, c }, columnId) {
     const timeline = await getTimeline(issueNum);
 		
 		// Add and remove labels as well as post comment if the issue's timeline indicates the issue is inactive, to be updated or up to date accordingly 
-    // responseObject has two properties: {result: true/false, labels: [string]}
-		const responseObject = isTimelineOutdated(timeline, issueNum, assignees)
-
-		if (responseObject.result === true && responseObject.labels === toUpdateLabel) { // Outdated, add toUpdateLabel
+		const responseObject = await isTimelineOutdated(timeline, issueNum, assignees)
+		if (responseObject.result === true && responseObject.labels === toUpdateLabel) {
 			console.log(`Going to ask for an update now for issue #${issueNum}`);
 			await removeLabels(issueNum, statusUpdatedLabel, inactiveLabel);  
 			await addLabels(issueNum, responseObject.labels); 
 			await postComment(issueNum, assignees, toUpdateLabel);
-		} else if (responseObject.result === false && responseObject.labels === statusUpdatedLabel) { // Not outdated, add statusUpdatedLabel
+		} else if (responseObject.result === true && responseObject.labels === statusUpdatedLabel) {
 			await removeLabels(issueNum, toUpdateLabel, inactiveLabel);
 			await addLabels(issueNum, responseObject.labels);
-		} else if (responseObject.result === true && responseObject.labels === inactiveLabel) { // Outdated, add inactiveLabel
+		} else if (responseObject.result === true && responseObject.labels === inactiveLabel) {
 			console.log(`Going to ask for an update now for issue #${issueNum}`);
 			await removeLabels(issueNum, toUpdateLabel, statusUpdatedLabel);
 			await addLabels(issueNum, responseObject.labels);
 			await postComment(issueNum, assignees, inactiveLabel);
-		} else if (responseObject.result === false && responseObject.labels === '') { // Not outdated because recently assigned, but not updated either, remove all update-related labels
+		} else {
 			console.log(`No updates needed for issue #${issueNum}`);
-			await removeLabels(issueNum, toUpdateLabel, inactiveLabel, statusUpdatedLabel);
+			await removeLabels(issueNum, toUpdateLabel, inactiveLabel);
+			await addLabels(issueNum, responseObject.labels);
 		}
 	}
 }	
