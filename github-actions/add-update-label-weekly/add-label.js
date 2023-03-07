@@ -144,7 +144,7 @@ function isTimelineOutdated(timeline, issueNum, assignees) {
   let lastAssignedTimestamp = null;
   let lastCommentTimestamp = null;
 
-  for (const i = timeline.length - 1; i >= 0; i--) {
+  for (let i = timeline.length - 1; i >= 0; i--) {
     let eventObj = timeline[i];
     let eventType = eventObj.event;
 
