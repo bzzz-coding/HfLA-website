@@ -151,37 +151,45 @@ function isTimelineOutdated(timeline, issueNum, assignees) {
     // if cross-referenced and fixed/resolved/closed by assignee, issue is considered updated
     // isLinkedIssue checks if the 'body'(comment) of the event mentioned closing/fixing/resolving this current issue
     if (eventType === 'cross-referenced' && isLinkedIssue(eventObj, issueNum) && assignees.includes(eventObj.actor.login)) {
+      console.log(`Cross-referenced by assignee, use Updated label`);
       return { result: true, labels: statusUpdatedLabel }
     }
 
     let eventTimestamp = eventObj.updated_at || eventObj.created_at;
+    console.log(`eventTimestamp: ${eventTimestamp}`);
 
     // update the lastCommentTimestamp if this is the first (most recent) comment
     if (eventType === 'commented' && isCommentByAssignees(eventObj, assignees)) {
       if (!lastCommentTimestamp) {
         lastCommentTimestamp = eventTimestamp;
+        console.log(`Updated lastCommentTimestamp: ${lastCommentTimestamp}`);
       }
     }
 
     // update the lastAssignedTimestamp if this is the first (most recent) time an assignee was assigned to the issue
-    if (eventType === 'assigned' && assignees.includes(eventObj.assignee.login)) { // note that the assignee property has the login of the dev assigned to this issue in this event, the actor property might have a different login if the dev didn't self-assign, but was assigned by another dev
+    else if (eventType === 'assigned' && assignees.includes(eventObj.assignee.login)) { // note that the assignee property has the login of the dev assigned to this issue in this event, the actor property might have a different login if the dev didn't self-assign, but was assigned by another dev
       if (!lastAssignedTimestamp) {
         lastAssignedTimestamp = eventTimestamp;
+        console.log(`Updated lastAssignedTimestamp: ${lastAssignedTimestamp}`);
       }
     }
   }
 
   if (lastCommentTimestamp && isMomentRecent(lastCommentTimestamp, sevenDayCutoffTime)) { // if commented within 7 days
+    console.log(`Commented by assignee within 7 days, use Updated label`);
     return { result: false, labels: statusUpdatedLabel }
   }
   if (lastAssignedTimestamp && isMomentRecent(lastAssignedTimestamp, sevenDayCutoffTime)) { // if an assignee was assigned within 7 days
+    console.log(`Assigned by assignee within 7 days, use '' label`);
     return { result: false, labels: '' } // ?? if recently assigned but no comment yet, should we add the 'Status: Updated' label?
   }
   if ((lastCommentTimestamp && isMomentRecent(lastCommentTimestamp, fourteenDayCutoffTime)) || (lastAssignedEvent && isMomentRecent(lastAssignedEvent, fourteenDayCutoffTime))) { // if last comment was between 7-14 days, or no comment but an assginee was assigned during this period, issue is outdated and add 'To Update !' label
+    console.log(`Commented by assignee or assigned between 7 and 14 days, use ToUpdate label`);
     return { result: true, labels: toUpdateLabel }
   }
 
   // if no comment or assigning found within 14 days, issue is outdated and add '2 weeks inactive' label
+  
   return { result: true, labels: inactiveLabel }
 }
 
