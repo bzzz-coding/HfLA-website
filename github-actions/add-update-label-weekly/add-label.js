@@ -156,7 +156,9 @@ function isTimelineOutdated(timeline, issueNum, assignees) {
     }
 
     let eventTimestamp = eventObj.updated_at || eventObj.created_at;
-    console.log(`eventTimestamp: ${eventTimestamp}`);
+    if (i === 0) {
+      console.log(`first eventTimestamp: ${eventTimestamp}; actor: ${eventObj.actor.login}`);
+    }
 
     // update the lastCommentTimestamp if this is the first (most recent) comment
     if (eventType === 'commented' && isCommentByAssignees(eventObj, assignees)) {
@@ -183,7 +185,7 @@ function isTimelineOutdated(timeline, issueNum, assignees) {
     console.log(`Assigned by assignee within 7 days, use '' label`);
     return { result: false, labels: '' } // ?? if recently assigned but no comment yet, should we add the 'Status: Updated' label?
   }
-  if ((lastCommentTimestamp && isMomentRecent(lastCommentTimestamp, fourteenDayCutoffTime)) || (lastAssignedEvent && isMomentRecent(lastAssignedEvent, fourteenDayCutoffTime))) { // if last comment was between 7-14 days, or no comment but an assginee was assigned during this period, issue is outdated and add 'To Update !' label
+  if ((lastCommentTimestamp && isMomentRecent(lastCommentTimestamp, fourteenDayCutoffTime)) || (lastAssignedTimestamp && isMomentRecent(lastAssignedTimestamp, fourteenDayCutoffTime))) { // if last comment was between 7-14 days, or no comment but an assginee was assigned during this period, issue is outdated and add 'To Update !' label
     console.log(`Commented by assignee or assigned between 7 and 14 days, use ToUpdate label`);
     return { result: true, labels: toUpdateLabel }
   }
