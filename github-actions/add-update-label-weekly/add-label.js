@@ -144,10 +144,9 @@ function isTimelineOutdated(timeline, issueNum, assignees) { // assignees is an 
     let eventType = eventObj.event;
     
     if (i === 0) {
-      console.log(`first event: ${eventType}, created_at: ${eventObj.created_at} by ${eventObj.actor.login}`);
-      if (eventObj.updated_at) {
-        console.log(`updated_at: ${eventObj.updated_at} by ${eventObj.actor.login}`);
-      }
+      for (const property in eventObj) {
+        console.log(`property: ${property}, value: ${eventObj[property]}`)
+      }	
     }
       
 
