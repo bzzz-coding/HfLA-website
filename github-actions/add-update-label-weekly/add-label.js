@@ -145,7 +145,7 @@ function isTimelineOutdated(timeline, issueNum, assignees) { // assignees is an 
     
     if (i === 0) {
       for (const property in eventObj) {
-        console.log(`property: ${property}, value: ${eventObj[property]}`)
+        console.log(`index 0, first event in timeline. property: ${property}, value: ${eventObj[property]}`)
       }	
     }
       
