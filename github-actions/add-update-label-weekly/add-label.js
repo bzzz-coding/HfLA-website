@@ -146,6 +146,12 @@ function isTimelineOutdated(timeline, issueNum, assignees) { // assignees is an 
     if (i === 0) {
       for (const property in eventObj) {
         console.log(`index 0, first event in timeline. property: ${property}, value: ${eventObj[property]}`)
+	if (eventObj.actor) {
+	  console.log(`actor: ${eventObj.actor.login}`)
+	}
+	if (eventObj.event === 'labeled') {
+	  console.log(`labels: ${eventObj.label.name}`)
+	}
       }	
     }
       
