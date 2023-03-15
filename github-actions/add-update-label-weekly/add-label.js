@@ -55,7 +55,7 @@ async function main({ g, c }, columnId) {
     } else if (responseObject.result === false && responseObject.labels === statusUpdatedLabel) { // Updated within 3 days, retain 'Status: Updated' label if there is one
       console.log(`Updated within 3 days, retain updated label for issue #${issueNum}`);
       await removeLabels(issueNum, toUpdateLabel, inactiveLabel);
-    } else if (responseObject.result === false && responseObject.labels === '') { // Updated between 3 and 7 days, or recently assigned, remove all three update-related labels
+    } else if (responseObject.result === false && responseObject.labels === '') { // Updated between 3 and 7 days, or recently assigned, or fixed by PR, remove all three update-related labels
       console.log(`No updates needed for issue #${issueNum}, will remove all labels`);
       await removeLabels(issueNum, toUpdateLabel, inactiveLabel, statusUpdatedLabel);
     }
@@ -198,7 +198,7 @@ function isTimelineOutdated(timeline, issueNum, assignees) { // assignees is an 
   if ((lastCommentTimestamp && isMomentRecent(lastCommentTimestamp, fourteenDayCutoffTime)) || (lastAssignedTimestamp && isMomentRecent(lastAssignedTimestamp, fourteenDayCutoffTime))) { // if last comment was between 7-14 days, or no comment but an assginee was assigned during this period, issue is outdated and add 'To Update !' label
     console.log(`Issue #${issueNum} commentedommented by assignee or assigned between 7 and 14 days, use 'To Update !' label`);
     if ((lastCommentTimestamp && isMomentRecent(lastCommentTimestamp, fourteenDayCutoffTime))) {
-      console.log(`Issue #${issueNum} commentedommented by assignee between 7 and 14 days, use 'To Update !' label; timestamp: ${lastCommentTimestamp}`)
+      console.log(`Issue #${issueNum} commented by assignee between 7 and 14 days, use 'To Update !' label; timestamp: ${lastCommentTimestamp}`)
     } else if (lastAssignedTimestamp && isMomentRecent(lastAssignedTimestamp, fourteenDayCutoffTime)) {
       console.log(`Issue #${issueNum} commented assigned between 7 and 14 days, use 'To Update !' label; timestamp: ${lastAssignedTimestamp}`)
     }
@@ -206,6 +206,7 @@ function isTimelineOutdated(timeline, issueNum, assignees) { // assignees is an 
   }
 
   // if no comment or assigning found within 14 days, issue is outdated and add '2 weeks inactive' label
+  console.log(`Issue #${issueNum} has no update within 14 days, use '2 weeks inactive' label`)
   return { result: true, labels: inactiveLabel }
 }
 
