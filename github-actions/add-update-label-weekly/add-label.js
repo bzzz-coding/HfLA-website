@@ -159,7 +159,7 @@ function isTimelineOutdated(timeline, issueNum, assignees) { // assignees is an 
     // if cross-referenced and fixed/resolved/closed by assignee, remove all update-related labels
     if (eventType === 'cross-referenced' && isLinkedIssue(eventObj, issueNum) && assignees.includes(eventObj.actor.login)) { // isLinkedIssue checks if the 'body'(comment) of the event mentioned closing/fixing/resolving this current issue
       console.log(`Issue fixed/resolved/closed by assignee, remove all update-related labels`);
-      return { result: true, labels: '' }
+      return { result: false, labels: '' } // remove all three labels
     }
 
     let eventTimestamp = eventObj.updated_at || eventObj.created_at;
@@ -192,6 +192,11 @@ function isTimelineOutdated(timeline, issueNum, assignees) { // assignees is an 
 
   if ((lastCommentTimestamp && isMomentRecent(lastCommentTimestamp, fourteenDayCutoffTime)) || (lastAssignedTimestamp && isMomentRecent(lastAssignedTimestamp, fourteenDayCutoffTime))) { // if last comment was between 7-14 days, or no comment but an assginee was assigned during this period, issue is outdated and add 'To Update !' label
     console.log(`Commented by assignee or assigned between 7 and 14 days, use 'To Update !' label`);
+    if ((lastCommentTimestamp && isMomentRecent(lastCommentTimestamp, fourteenDayCutoffTime))) {
+      console.log(`Commented by assignee between 7 and 14 days, use 'To Update !' label; timestamp: ${lastCommentTimestamp}`)
+    } else if (lastAssignedTimestamp && isMomentRecent(lastAssignedTimestamp, fourteenDayCutoffTime)) {
+      console.log(`Assigned between 7 and 14 days, use 'To Update !' label; timestamp: ${lastAssignedTimestamp}`)
+    }
     return { result: true, labels: toUpdateLabel }
   }
 
