@@ -3,7 +3,7 @@ on:
   pull_request_target:
     types: [opened, closed]
     branches:
-      - 'gh-pages'
+      - 'gha-testing'
 
 jobs:
   # Run an echo to confirm that the action was triggered
