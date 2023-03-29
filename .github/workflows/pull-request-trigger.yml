@@ -10,7 +10,7 @@ jobs:
   Hello-World:
     runs-on: ubuntu-latest
     steps:
-     - run: echo "🍺 This job was automatically triggered by a ${{ github.event_name }} event."
+     - run: echo "???🍺 This job was automatically triggered by a ${{ github.event_name }} event."
 
 
   # Moves newly opened PRs onto Project Board in column 'PR Needs review...'
