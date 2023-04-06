@@ -1,22 +1,23 @@
-name: "my test workflow"
+# use opt+space (ctrl+space for windows?) to get prompts/hints for yaml syntax
+name: "my test workflow" # The name of the action/workflow, will appear under "All Workflows" in "Actions"
 on:
-  workflow_dispatch
-jobs:
-  first-job:
-    runs-on: ubuntu-latest
+  workflow_dispatch # one of the triggers, check all events that trigger workflow: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#about-events-that-trigger-workflows
+jobs: # can have one or more jobs; jobs can run parallel or in sequence
+  first-job: # name of the job
+    runs-on: ubuntu-latest # specifies that this job will run on a virtual machine that runs Ubuntu as its operating system; GitHub Actions supports several different operating systems and environments: https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners
     steps: 
       - run: echo "This is the first job 🌟"
       
   second-job:
-    needs: [first-job]
+    needs: [first-job] # wait for first-job to finish, then run this job
     runs-on: ubuntu-latest
     steps:
       - run: echo "This is the second job"
 
-  third_job_matrix:
-    strategy:
-      matrix:
+  third_job_matrix: # runs in parallel to the first job
+    strategy: # runs the same step(s) with each element in the array;
+      matrix: # more on matrix: https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs
         nth_job: [3, 4, 5]
     runs-on: ubuntu-latest
     steps:
-     - run: echo "This is job ${{ matrix.nth_job }}"
+     - run: echo "This is job ${{ matrix.nth_job }}" # use ${{}} for variables
