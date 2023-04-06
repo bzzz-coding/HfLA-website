@@ -20,4 +20,4 @@ jobs: # can have one or more jobs; jobs can run parallel or in sequence
         nth_job: [3, 4, 5]
     runs-on: ubuntu-latest
     steps:
-     - run: echo "This is job ${{ matrix.nth_job }}" # use ${{}} for variables
+     - run: echo "This is job $matrix.nth_job" # use ${{}} for variables
