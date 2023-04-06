@@ -19,4 +19,4 @@ jobs:
         nth_job: [3, 4, 5]
     runs-on: ubuntu-latest
     steps:
-        - run: echo "This is job \#${{ matrix.nth_job }}"
+        - run: echo "This is job" ${{ matrix.nth_job }}
