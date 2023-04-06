@@ -1,1 +1,22 @@
+name: "my test workflow"
+on:
+  workflow_dispatch
+jobs:
+  first-job:
+    runs-on: ubuntu-lates
+    steps: 
+      - run: echo "This is the first job 🌟"
+      
+  second-job:
+    needs: [first-job]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "This is the second job"
 
+  third_job_matrix:
+    strategy:
+      matrix:
+        nth_job: [3, 4, 5]
+    runs-on: ubuntu-latest
+    steps:
+        - run: echo ${{ matrix.version }}
